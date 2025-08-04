@@ -1,16 +1,43 @@
-# menu_digital
+# ☕ Cardápio Digital App
 
-A new Flutter project.
+Um aplicativo de cardápio digital para uma cafeteria, desenvolvido com Flutter. Permite que os clientes visualizem os itens, façam pedidos.
 
-## Getting Started
+## ✨ Funcionalidades
 
-This project is a starting point for a Flutter application.
+* Visualização do cardápio com imagens e descrições.
+* Adição de itens a um carrinho de compras.
+* Envio de pedidos para a cozinha (simulado).
+* Visualização da conta com todos os itens pendentes.
+* Persistência de dados local com `sqflite`.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🚀 Como Executar o Projeto
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+**1. Clone o repositório:**
+```bash
+git clone [https://github.com/fsabrantes96/menu_digital_app.git](https://github.com/fsabrantes96/menu_digital_app.git)
+```
+
+**2. Navegue até a pasta do projeto:**
+```bash
+cd menu_digital_app
+```
+
+**3. Instale as dependências:**
+```bash
+flutter pub get
+```
+
+**4. Execute o aplicativo:**
+```bash
+flutter run
+```
+
+## 🛠️ Tecnologias Utilizadas
+
+* **Flutter:** Framework para desenvolvimento de apps multiplataforma.
+* **Dart:** Linguagem de programação.
+* **sqflite:** Banco de dados SQL local para persistência de dados.
+
+---
+Feito por [Felipe Abrantes](https://github.com/fsabrantes96).
