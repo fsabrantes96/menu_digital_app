@@ -1,16 +1,27 @@
-# menu_digital
+# ☕ Cardápio Digital App (Full Stack)
 
-A new Flutter project.
+Este repositório contém o código completo para um sistema de cardápio digital para uma cafeteria, incluindo o aplicativo do cliente (frontend) e o chatbot de atendimento (backend).
 
-## Getting Started
+## 📂 Estrutura do Projeto
 
-This project is a starting point for a Flutter application.
+O projeto está organizado num monorepo com duas pastas principais:
 
-A few resources to get you started if this is your first Flutter project:
+* **/frontend**: Contém o aplicativo móvel desenvolvido em Flutter. É a interface que os clientes usam no tablet do estabelecimento.
+* **/backend**: Contém o servidor serverless (Node.js) para o chatbot do Telegram, integrado com a IA do Gemini e hospedado na Vercel.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 📱 Frontend (Flutter App)
+
+O aplicativo permite que os clientes visualizem o cardápio, façam pedidos e paguem a conta.
+
+**Para executar o frontend:**
+```bash
+# Navegue até à pasta do frontend
+cd frontend
+
+# Instale as dependências
+flutter pub get
+
+# Execute o aplicativo
+flutter run
