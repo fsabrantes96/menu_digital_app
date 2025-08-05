@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:menu_digital/models/order.dart';
+import 'package:menu_digital/screens/bill_screen.dart';
 import 'package:menu_digital/screens/menu_screen.dart';
 import 'package:menu_digital/screens/order_screen.dart';
-import 'package:menu_digital/screens/bill_screen.dart';
-import 'package:menu_digital/models/order.dart'; // Usaremos Order, não Product
+import 'package:menu_digital/screens/start_screen.dart';
+import 'package:menu_digital/screens/welcome_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,20 +49,29 @@ class CoffeeShopApp extends StatelessWidget {
           ),
         ),
       ),
-      // AQUI: A rota inicial não é necessária, pois `onGenerateRoute` já lida com o '/'
+      initialRoute: '/',
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
-            return MaterialPageRoute(builder: (_) => const MenuScreen());
-
+            return MaterialPageRoute(builder: (_) => const StartScreen());
+          case '/welcome':
+            return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+          case '/menu':
+            // Garante que o argumento não é nulo antes de usar
+            final customerId = settings.arguments as int? ?? 0;
+            return MaterialPageRoute(
+              builder: (_) => MenuScreen(customerId: customerId),
+            );
           case '/order':
-            final cart = settings.arguments as List<Order>;
-            return MaterialPageRoute(builder: (_) => OrderScreen(cart: cart));
-
+            // Garante que os argumentos não são nulos antes de usar
+            final args = settings.arguments as Map<String, dynamic>? ?? {};
+            final cart = args['cart'] as List<Order>? ?? [];
+            final customerId = args['customerId'] as int? ?? 0;
+            return MaterialPageRoute(
+              builder: (_) => OrderScreen(cart: cart, customerId: customerId),
+            );
           case '/bill':
-            // Não passamos o total como argumento, a BillScreen buscará do DB
             return MaterialPageRoute(builder: (_) => const BillScreen());
-
           default:
             return MaterialPageRoute(
               builder: (_) => const Scaffold(

@@ -1,5 +1,6 @@
 class Order {
   final int? id;
+  final int? customerId;
   final int menuItemId; // ID do item do cardápio
   final String menuItemName; // Nome do intem para exebição facil
   int quantity;
@@ -9,6 +10,7 @@ class Order {
 
   Order({
     this.id,
+    this.customerId,
     required this.menuItemId,
     required this.menuItemName,
     required this.quantity,
@@ -21,6 +23,7 @@ class Order {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'customerId': customerId,
       'menuItemId': menuItemId,
       'menuItemName': menuItemName,
       'quantity': quantity,
@@ -36,6 +39,7 @@ class Order {
   factory Order.fromMap(Map<String, dynamic> map) {
     return Order(
       id: map['id'],
+      customerId: map['customerId'],
       menuItemId: map['menuItemId'],
       menuItemName: map['menuItemName'],
       quantity: map['quantity'],
@@ -47,6 +51,6 @@ class Order {
 
   @override
   String toString() {
-    return 'Order{id: $id, menuItemId: $menuItemId, menuItemName: $menuItemName, quantity: $quantity, price: $price, timestamp: $timestamp, isBilled: $isBilled}';
+    return 'Order{id: $id, customerId: $customerId, menuItemId: $menuItemId, menuItemName: $menuItemName, quantity: $quantity, price: $price, timestamp: $timestamp, isBilled: $isBilled}';
   }
 }

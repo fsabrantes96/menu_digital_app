@@ -1,40 +1,33 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'dart:async'; // Para Future e async/await
+import 'dart:async';
 import 'package:menu_digital/models/menu_item.dart';
 import 'package:menu_digital/models/order.dart';
+import 'package:menu_digital/models/customer.dart'; // Importa o novo modelo
 
 class DatabaseHelper {
-  static Database? _database; // Instância do banco de dados
-  static final DatabaseHelper instance =
-      DatabaseHelper._privateConstructor(); // Singleton
+  static Database? _database;
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
   DatabaseHelper._privateConstructor();
 
-  // Getter para o banco de dados. Se não existir, inicializa.
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDb();
     return _database!;
   }
 
-  // Inicializa o banco de dados.
   Future<Database> _initDb() async {
-    String path = join(
-      await getDatabasesPath(),
-      'menu_digital_app.db',
-    ); // Define o caminho do DB
+    String path = join(await getDatabasesPath(), 'menu_digital_app.db');
     return await openDatabase(
       path,
-      version: 2, // A versão continua 2
+      version: 3, // VERSÃO ATUALIZADA PARA 3
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
   }
 
-  // Cria as tabelas do banco de dados.
   Future _onCreate(Database db, int version) async {
-    // Tabela de itens do cardápio com o novo campo imagePath
     await db.execute('''
       CREATE TABLE menu_items(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,37 +35,67 @@ class DatabaseHelper {
         description TEXT NOT NULL,
         price REAL NOT NULL,
         category TEXT NOT NULL,
-        imagePath TEXT NOT NULL 
+        imagePath TEXT NOT NULL
       )
     ''');
-    // Tabela de pedidos
+
+    // NOVA TABELA DE CLIENTES
+    await db.execute('''
+      CREATE TABLE customers(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        timestamp TEXT NOT NULL
+      )
+    ''');
+
     await db.execute('''
       CREATE TABLE orders(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        customerId INTEGER NOT NULL, -- VÍNCULO COM O CLIENTE
         menuItemId INTEGER NOT NULL,
         menuItemName TEXT NOT NULL,
         quantity INTEGER NOT NULL,
-        price REAL NOT NULL, 
+        price REAL NOT NULL,
         timestamp TEXT NOT NULL,
         isBilled INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY (customerId) REFERENCES customers (id),
         FOREIGN KEY (menuItemId) REFERENCES menu_items (id) ON DELETE CASCADE
       )
     ''');
 
-    // Popula o cardápio com itens iniciais, agora com imagePath
     await _populateInitialData(db);
   }
 
-  // Lida com atualização de versão do DB
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < newVersion) {
       await db.execute("DROP TABLE IF EXISTS orders");
+      await db.execute("DROP TABLE IF EXISTS customers");
       await db.execute("DROP TABLE IF EXISTS menu_items");
       await _onCreate(db, newVersion);
     }
   }
 
-  // Método para popular os dados iniciais com os caminhos dos assets
+  // NOVO MÉTODO PARA INSERIR CLIENTES
+  Future<int> insertCustomer(Customer customer) async {
+    final db = await instance.database;
+    return await db.insert('customers', customer.toMap());
+  }
+
+  // ATUALIZADO para receber o ID do cliente
+  Future<void> insertOrdersBatch(List<Order> orders, int customerId) async {
+    final db = await instance.database;
+    final batch = db.batch();
+    for (final order in orders) {
+      // Adiciona o customerId ao mapa do pedido antes de inserir
+      final orderMap = order.toMap();
+      orderMap['customerId'] = customerId;
+      batch.insert('orders', orderMap);
+    }
+    await batch.commit(noResult: true);
+  }
+
+  // O resto do arquivo continua igual...
   Future<void> _populateInitialData(Database db) async {
     await db.insert(
       'menu_items',
@@ -132,16 +155,6 @@ class DatabaseHelper {
     return List.generate(maps.length, (i) {
       return MenuItem.fromMap(maps[i]);
     });
-  }
-
-  // --- Operações CRUD para Order ---
-  Future<void> insertOrdersBatch(List<Order> orders) async {
-    final db = await instance.database;
-    final batch = db.batch();
-    for (final order in orders) {
-      batch.insert('orders', order.toMap());
-    }
-    await batch.commit(noResult: true);
   }
 
   Future<List<Order>> getOrders({bool? isBilled}) async {

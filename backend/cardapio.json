@@ -1,0 +1,39 @@
+{
+  "cardapio": [
+    {
+      "nome": "Café Expresso",
+      "descricao": "Café forte e encorpado.",
+      "preco": 5.00,
+      "categoria": "Bebidas",
+      "informacoes_adicionais": "Grãos arábica, sem açúcar."
+    },
+    {
+      "nome": "Cappuccino",
+      "descricao": "Café com leite vaporizado e espuma.",
+      "preco": 8.50,
+      "categoria": "Bebidas",
+      "informacoes_adicionais": "Contém leite integral. Pode ser feito com leite de aveia por um custo adicional."
+    },
+    {
+      "nome": "Pão de Queijo",
+      "descricao": "Tradicional pão de queijo mineiro.",
+      "preco": 4.00,
+      "categoria": "Comidas",
+      "informacoes_adicionais": "Não contém glúten. Contém queijo e ovos."
+    },
+    {
+      "nome": "Bolo de Chocolate",
+      "descricao": "Fatia de bolo de chocolate com cobertura.",
+      "preco": 12.00,
+      "categoria": "Doces",
+      "informacoes_adicionais": "Contém glúten, leite e ovos. Não contém nozes ou outras castanhas."
+    },
+    {
+      "nome": "Suco de Laranja",
+      "descricao": "Suco natural de laranja.",
+      "preco": 7.00,
+      "categoria": "Bebidas",
+      "informacoes_adicionais": "Feito com laranjas frescas, sem adição de açúcar."
+    }
+  ]
+}

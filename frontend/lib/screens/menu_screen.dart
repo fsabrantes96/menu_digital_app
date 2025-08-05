@@ -1,11 +1,13 @@
-// lib/screens/menu_screen.dart
 import 'package:flutter/material.dart';
-import 'package:menu_digital/models/menu_item.dart'; // Importa o modelo MenuItem
-import 'package:menu_digital/models/order.dart'; // Importa o modelo Order
-import 'package:menu_digital/services/database_helper.dart'; // Importa o DatabaseHelper
+import 'package:menu_digital/models/menu_item.dart';
+import 'package:menu_digital/models/order.dart';
+import 'package:menu_digital/services/database_helper.dart';
+import 'package:qr_flutter/qr_flutter.dart'; // Importa o pacote do QR Code
 
 class MenuScreen extends StatefulWidget {
-  const MenuScreen({super.key});
+  final int customerId;
+
+  const MenuScreen({super.key, required this.customerId});
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -13,15 +15,14 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   late Future<List<MenuItem>> _menuItemsFuture;
-  late Future<List<Order>>
-  _unbilledOrdersFuture; // Future para verificar pedidos não faturados
+  late Future<List<Order>> _unbilledOrdersFuture;
   final List<Order> _cart = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadAllData(); // Chamada inicial para carregar todos os dados
+    _loadAllData();
   }
 
   @override
@@ -42,7 +43,7 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _loadAllData(); // Recarrega todos os dados ao retornar para a tela
+      _loadAllData();
     }
   }
 
@@ -70,6 +71,7 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   }
 
   void _showMessage(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -81,12 +83,82 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
     );
   }
 
+  // Função ATUALIZADA para mostrar um QR Code
+  void _showTelegramQrCode() {
+    // IMPORTANTE: Substitua 'SEU_BOT_USERNAME' pelo username do seu bot
+    const botUsername = 'SaborArteAtendenteBot'; // Exemplo
+    final String telegramUrl = 'https://t.me/$botUsername';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text(
+          'Fale com o nosso Assistente',
+          textAlign: TextAlign.center,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 250,
+              height: 250,
+              // Widget que renderiza o QR Code
+              child: QrImageView(
+                data: telegramUrl,
+                version: QrVersions.auto,
+                size: 250.0,
+                gapless: false,
+                // Adiciona o logo do Telegram no meio (opcional)
+                embeddedImage: const AssetImage(
+                  'assets/images/telegram_logo.png',
+                ),
+                embeddedImageStyle: const QrEmbeddedImageStyle(
+                  size: Size(40, 40),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Aponte a câmara do seu telemóvel para conversar com o nosso assistente no Telegram.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Fechar'),
+          ),
+        ],
+        actionsAlignment: MainAxisAlignment.center,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cardápio da Cafeteria')),
+      appBar: AppBar(
+        title: const Text('Cardápio da Cafetaria'),
+        automaticallyImplyLeading: false,
+      ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: OutlinedButton.icon(
+              onPressed: _showTelegramQrCode, // Ação atualizada
+              icon: const Icon(Icons.qr_code_scanner),
+              label: const Text('Tirar dúvidas sobre o cardápio'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 40),
+                foregroundColor: Colors.brown.shade700,
+                side: BorderSide(color: Colors.brown.shade200),
+              ),
+            ),
+          ),
           FutureBuilder<List<Order>>(
             future: _unbilledOrdersFuture,
             builder: (context, snapshot) {
@@ -94,12 +166,16 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                   snapshot.hasData &&
                   snapshot.data!.isNotEmpty) {
                 return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.pushNamed(context, '/bill');
                     },
-                    child: const Text('Pedir a Conta'),
+                    icon: const Icon(Icons.receipt_long),
+                    label: const Text('Pedir a Conta'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 40),
+                    ),
                   ),
                 );
               }
@@ -135,16 +211,13 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
                             children: [
-                              // WIDGET DA IMAGEM ATUALIZADO
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8.0),
                                 child: Image.asset(
-                                  // MUDOU DE Image.network para Image.asset
-                                  item.imagePath, // USA O CAMINHO LOCAL
+                                  item.imagePath,
                                   width: 80,
                                   height: 80,
                                   fit: BoxFit.cover,
-                                  // Em caso de erro (ex: imagem não encontrada nos assets)
                                   errorBuilder: (context, error, stackTrace) {
                                     return Container(
                                       width: 80,
@@ -158,8 +231,7 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                                   },
                                 ),
                               ),
-                              const SizedBox(width: 16), // Espaçamento
-                              // COLUNA COM DETALHES DO ITEM
+                              const SizedBox(width: 16),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,8 +263,7 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 8), // Espaçamento
-                              // BOTÃO DE ADICIONAR
+                              const SizedBox(width: 8),
                               ElevatedButton(
                                 onPressed: () => _addToCart(item),
                                 child: const Icon(Icons.add_shopping_cart),
@@ -215,7 +286,7 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                 final result = await Navigator.pushNamed(
                   context,
                   '/order',
-                  arguments: _cart,
+                  arguments: {'cart': _cart, 'customerId': widget.customerId},
                 );
 
                 _loadAllData();
