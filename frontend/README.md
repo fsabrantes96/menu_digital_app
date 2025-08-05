@@ -25,3 +25,18 @@ flutter pub get
 
 # Execute o aplicativo
 flutter run
+
+# Navegue até à pasta do backend
+cd backend
+
+# Faça o deploy para a Vercel
+vercel --prod
+
+🛠️ Tecnologias Utilizadas
+Frontend: Flutter, Dart, sqflite
+
+Backend: Node.js, Vercel, Telegram Bot API
+
+Inteligência Artificial: Google Gemini
+
+Feito por Felipe Abrantes.
