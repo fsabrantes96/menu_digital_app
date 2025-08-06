@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:menu_digital/models/order.dart';
-import 'package:menu_digital/services/database_helper.dart';
+import 'package:menu_digital/services/firestore_service.dart';
 
 class OrderScreen extends StatefulWidget {
   final List<Order> cart;
-  final int customerId; // Recebe o ID do cliente
+  // CORREÇÃO: Alterado de int para String
+  final String customerId;
 
   const OrderScreen({super.key, required this.cart, required this.customerId});
 
@@ -14,6 +15,7 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   late List<Order> _currentCart;
+  final FirestoreService _firestoreService = FirestoreService();
 
   @override
   void initState() {
@@ -83,16 +85,13 @@ class _OrderScreenState extends State<OrderScreen> {
     );
 
     if (confirmed == true) {
-      // Passa o carrinho e o ID do cliente para o método do banco de dados
-      await DatabaseHelper.instance.insertOrdersBatch(
-        _currentCart,
-        widget.customerId,
-      );
+      // Usa o novo serviço do Firestore
+      await _firestoreService.createOrders(_currentCart, widget.customerId);
 
       if (!mounted) return;
 
       _showMessage('Pedido enviado!');
-      Navigator.pop(context, <Order>[]);
+      Navigator.pop(context, <Order>[]); // Retorna um carrinho vazio
     }
   }
 

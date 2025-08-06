@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:menu_digital/models/order.dart';
-import 'package:menu_digital/screens/bill_screen.dart';
-import 'package:menu_digital/screens/menu_screen.dart';
-import 'package:menu_digital/screens/order_screen.dart';
-import 'package:menu_digital/screens/start_screen.dart';
-import 'package:menu_digital/screens/welcome_screen.dart';
+import 'package:firebase_core/firebase_core.dart'; // Importa o Firebase Core
+import 'firebase_options.dart'; // Im
+import 'models/order.dart';
+import 'screens/bill_screen.dart';
+import 'screens/menu_screen.dart';
+import 'screens/order_screen.dart';
+import 'screens/start_screen.dart';
+import 'screens/welcome_screen.dart';
 
-void main() {
+// A função main agora é assíncrona para aguardar a inicialização do Firebase
+Future<void> main() async {
+  // Garante que os widgets do Flutter estão prontos
   WidgetsFlutterBinding.ensureInitialized();
+  // Inicializa o Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const CoffeeShopApp());
 }
 
@@ -58,7 +64,7 @@ class CoffeeShopApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const WelcomeScreen());
           case '/menu':
             // Garante que o argumento não é nulo antes de usar
-            final customerId = settings.arguments as int? ?? 0;
+            final customerId = settings.arguments as String? ?? '';
             return MaterialPageRoute(
               builder: (_) => MenuScreen(customerId: customerId),
             );
@@ -66,7 +72,7 @@ class CoffeeShopApp extends StatelessWidget {
             // Garante que os argumentos não são nulos antes de usar
             final args = settings.arguments as Map<String, dynamic>? ?? {};
             final cart = args['cart'] as List<Order>? ?? [];
-            final customerId = args['customerId'] as int? ?? 0;
+            final customerId = args['customerId'] as String? ?? '';
             return MaterialPageRoute(
               builder: (_) => OrderScreen(cart: cart, customerId: customerId),
             );

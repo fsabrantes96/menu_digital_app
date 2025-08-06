@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:menu_digital/models/customer.dart';
-import 'package:menu_digital/services/database_helper.dart';
+import 'package:menu_digital/services/firestore_service.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -14,6 +15,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+
+  // CORREÇÃO: Adiciona a declaração da variável que estava em falta
+  final _firestoreService = FirestoreService();
 
   final _phoneFormatter = MaskTextInputFormatter(
     mask: '(##) #####-####',
@@ -32,16 +36,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       final newCustomer = Customer(
         name: _nameController.text,
         phone: _phoneController.text,
-        timestamp: DateTime.now().toIso8601String(),
+        timestamp: Timestamp.now(), // Usa o Timestamp do Firestore
       );
 
-      // Insere o cliente no banco e obtém o ID dele
-      final customerId = await DatabaseHelper.instance.insertCustomer(
-        newCustomer,
-      );
+      // Cria o cliente no Firestore e obtém o ID
+      final customerId = await _firestoreService.createCustomer(newCustomer);
 
       if (mounted) {
-        // Navega para o menu, passando o ID do cliente para vincular os pedidos
+        // Navega para o menu, passando o ID do cliente
         Navigator.pushReplacementNamed(context, '/menu', arguments: customerId);
       }
     }
@@ -68,7 +70,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 const SizedBox(height: 30),
                 TextFormField(
                   controller: _nameController,
-                  // CORREÇÃO AQUI: Foca automaticamente neste campo
                   autofocus: true,
                   decoration: const InputDecoration(
                     labelText: 'Nome do Cliente',
