@@ -4,10 +4,17 @@ import 'package:menu_digital/services/firestore_service.dart';
 
 class OrderScreen extends StatefulWidget {
   final List<Order> cart;
-  // CORREÇÃO: Alterado de int para String
   final String customerId;
+  final String customerName;
+  final String tableNumber;
 
-  const OrderScreen({super.key, required this.cart, required this.customerId});
+  const OrderScreen({
+    super.key,
+    required this.cart,
+    required this.customerId,
+    required this.customerName,
+    required this.tableNumber,
+  });
 
   @override
   State<OrderScreen> createState() => _OrderScreenState();
@@ -85,13 +92,12 @@ class _OrderScreenState extends State<OrderScreen> {
     );
 
     if (confirmed == true) {
-      // Usa o novo serviço do Firestore
       await _firestoreService.createOrders(_currentCart, widget.customerId);
 
       if (!mounted) return;
 
       _showMessage('Pedido enviado!');
-      Navigator.pop(context, <Order>[]); // Retorna um carrinho vazio
+      Navigator.pop(context, <Order>[]);
     }
   }
 

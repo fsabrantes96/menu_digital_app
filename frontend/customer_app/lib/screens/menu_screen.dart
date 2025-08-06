@@ -2,13 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:flutter/material.dart';
 import 'package:menu_digital/models/menu_item.dart';
 import 'package:menu_digital/models/order.dart';
-import 'package:menu_digital/services/firestore_service.dart'; // Importação corrigida
+import 'package:menu_digital/services/firestore_service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class MenuScreen extends StatefulWidget {
-  final String customerId; // Recebe o ID do cliente como String
+  final String customerId;
+  final String customerName;
+  final String tableNumber;
 
-  const MenuScreen({super.key, required this.customerId});
+  const MenuScreen({
+    super.key,
+    required this.customerId,
+    required this.customerName,
+    required this.tableNumber,
+  });
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -32,7 +39,9 @@ class _MenuScreenState extends State<MenuScreen> {
             menuItemName: item.name,
             quantity: 1,
             price: item.price,
-            timestamp: Timestamp.now(), // Usa o Timestamp do Firestore
+            timestamp: Timestamp.now(),
+            customerName: widget.customerName,
+            tableNumber: widget.tableNumber,
           ),
         );
       }
@@ -54,8 +63,7 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   void _showTelegramQrCode() {
-    // IMPORTANTE: Substitua 'SEU_BOT_USERNAME' pelo username do seu bot
-    const botUsername = 'SaborArteAtendenteBot'; // Exemplo
+    const botUsername = 'SaborArteAtendenteBot';
     final String telegramUrl = 'https://t.me/$botUsername';
 
     showDialog(
@@ -244,7 +252,12 @@ class _MenuScreenState extends State<MenuScreen> {
                 final result = await Navigator.pushNamed(
                   context,
                   '/order',
-                  arguments: {'cart': _cart, 'customerId': widget.customerId},
+                  arguments: {
+                    'cart': _cart,
+                    'customerId': widget.customerId,
+                    'customerName': widget.customerName,
+                    'tableNumber': widget.tableNumber,
+                  },
                 );
 
                 if (result != null && result is List<Order>) {

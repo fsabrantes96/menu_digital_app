@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart'; // Importa o Firebase Core
-import 'firebase_options.dart'; // Im
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'models/order.dart';
 import 'screens/bill_screen.dart';
 import 'screens/menu_screen.dart';
@@ -8,11 +8,8 @@ import 'screens/order_screen.dart';
 import 'screens/start_screen.dart';
 import 'screens/welcome_screen.dart';
 
-// A função main agora é assíncrona para aguardar a inicialização do Firebase
 Future<void> main() async {
-  // Garante que os widgets do Flutter estão prontos
   WidgetsFlutterBinding.ensureInitialized();
-  // Inicializa o Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const CoffeeShopApp());
 }
@@ -63,18 +60,23 @@ class CoffeeShopApp extends StatelessWidget {
           case '/welcome':
             return MaterialPageRoute(builder: (_) => const WelcomeScreen());
           case '/menu':
-            // Garante que o argumento não é nulo antes de usar
-            final customerId = settings.arguments as String? ?? '';
+            final args = settings.arguments as Map<String, dynamic>? ?? {};
             return MaterialPageRoute(
-              builder: (_) => MenuScreen(customerId: customerId),
+              builder: (_) => MenuScreen(
+                customerId: args['customerId'] ?? '',
+                customerName: args['customerName'] ?? '',
+                tableNumber: args['tableNumber'] ?? '',
+              ),
             );
           case '/order':
-            // Garante que os argumentos não são nulos antes de usar
             final args = settings.arguments as Map<String, dynamic>? ?? {};
-            final cart = args['cart'] as List<Order>? ?? [];
-            final customerId = args['customerId'] as String? ?? '';
             return MaterialPageRoute(
-              builder: (_) => OrderScreen(cart: cart, customerId: customerId),
+              builder: (_) => OrderScreen(
+                cart: args['cart'] as List<Order>? ?? [],
+                customerId: args['customerId'] ?? '',
+                customerName: args['customerName'] ?? '',
+                tableNumber: args['tableNumber'] ?? '',
+              ),
             );
           case '/bill':
             return MaterialPageRoute(builder: (_) => const BillScreen());

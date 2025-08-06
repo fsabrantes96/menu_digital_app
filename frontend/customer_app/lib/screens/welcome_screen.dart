@@ -15,8 +15,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-
-  // CORREÇÃO: Adiciona a declaração da variável que estava em falta
+  final _tableController = TextEditingController(); // NOVO CONTROlADOR
   final _firestoreService = FirestoreService();
 
   final _phoneFormatter = MaskTextInputFormatter(
@@ -28,6 +27,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _tableController.dispose(); // FAZ O DISPOSE
     super.dispose();
   }
 
@@ -36,15 +36,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       final newCustomer = Customer(
         name: _nameController.text,
         phone: _phoneController.text,
-        timestamp: Timestamp.now(), // Usa o Timestamp do Firestore
+        tableNumber: _tableController.text, // OBTÉM O NÚMERO DA MESA
+        timestamp: Timestamp.now(),
       );
 
-      // Cria o cliente no Firestore e obtém o ID
       final customerId = await _firestoreService.createCustomer(newCustomer);
 
       if (mounted) {
-        // Navega para o menu, passando o ID do cliente
-        Navigator.pushReplacementNamed(context, '/menu', arguments: customerId);
+        // Passa o ID e o NOME do cliente e o NÚMERO DA MESA para a próxima tela
+        Navigator.pushReplacementNamed(
+          context,
+          '/menu',
+          arguments: {
+            'customerId': customerId,
+            'customerName': newCustomer.name,
+            'tableNumber': newCustomer.tableNumber,
+          },
+        );
       }
     }
   }
@@ -79,6 +87,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Por favor, insira o nome.';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                // NOVO CAMPO PARA O NÚMERO DA MESA
+                TextFormField(
+                  controller: _tableController,
+                  decoration: const InputDecoration(
+                    labelText: 'Número da Mesa',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.table_restaurant),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Por favor, insira o número da mesa.';
                     }
                     return null;
                   },

@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart'
-    hide Order; // CORREÇÃO AQUI
+import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:menu_digital/models/customer.dart';
 import 'package:menu_digital/models/menu_item.dart';
 import 'package:menu_digital/models/order.dart';
@@ -7,7 +6,6 @@ import 'package:menu_digital/models/order.dart';
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // Obtém o cardápio em tempo real
   Stream<List<MenuItem>> getMenuItemsStream() {
     return _db
         .collection('menuItems')
@@ -18,7 +16,6 @@ class FirestoreService {
         );
   }
 
-  // Obtém os pedidos não faturados em tempo real
   Stream<List<Order>> getUnbilledOrdersStream() {
     return _db
         .collection('orders')
@@ -30,7 +27,6 @@ class FirestoreService {
         );
   }
 
-  // Cria um novo cliente e retorna o seu ID
   Future<String> createCustomer(Customer customer) async {
     final docRef = await _db
         .collection('customers')
@@ -38,7 +34,7 @@ class FirestoreService {
     return docRef.id;
   }
 
-  // Cria um lote de pedidos para um cliente específico
+  // ATUALIZADO para receber o objeto Order completo
   Future<void> createOrders(List<Order> orders, String customerId) async {
     final batch = _db.batch();
     final ordersCollection = _db.collection('orders');
@@ -51,7 +47,6 @@ class FirestoreService {
     await batch.commit();
   }
 
-  // Marca uma lista de pedidos como faturados
   Future<void> markOrdersAsBilled(List<Order> orders) async {
     final batch = _db.batch();
     for (final order in orders) {

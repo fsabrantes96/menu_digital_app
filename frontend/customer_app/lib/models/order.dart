@@ -1,18 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Order {
-  final String? id; // Alterado de int? para String?
+  final String? id;
   final String? customerId;
-  final String menuItemId; // Alterado de int para String
+  final String customerName; // NOVO CAMPO
+  final String tableNumber; // NOVO CAMPO
+  final String menuItemId;
   final String menuItemName;
   int quantity;
   final double price;
-  final Timestamp timestamp; // Alterado de String para Timestamp
+  final Timestamp timestamp;
   bool isBilled;
 
   Order({
     this.id,
     this.customerId,
+    required this.customerName, // ADICIONADO
+    required this.tableNumber, // ADICIONADO
     required this.menuItemId,
     required this.menuItemName,
     required this.quantity,
@@ -21,12 +25,13 @@ class Order {
     this.isBilled = false,
   });
 
-  // NOVO: Converte um documento do Firestore num objeto Order
   factory Order.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     final data = snapshot.data()!;
     return Order(
       id: snapshot.id,
       customerId: data['customerId'],
+      customerName: data['customerName'] ?? 'Nome não encontrado', // ADICIONADO
+      tableNumber: data['tableNumber'] ?? 'Mesa ?', // ADICIONADO
       menuItemId: data['menuItemId'],
       menuItemName: data['menuItemName'],
       quantity: data['quantity'],
@@ -36,10 +41,11 @@ class Order {
     );
   }
 
-  // NOVO: Converte um objeto Order num mapa para o Firestore
   Map<String, dynamic> toFirestore(String customerId) {
     return {
       'customerId': customerId,
+      'customerName': customerName, // ADICIONADO
+      'tableNumber': tableNumber, // ADICIONADO
       'menuItemId': menuItemId,
       'menuItemName': menuItemName,
       'quantity': quantity,
